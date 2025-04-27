@@ -1,0 +1,7 @@
+role 'Page Security'
+	modelPermission: read
+
+	tablePermission PagesForUsers = PagesForUsers[User]=USERPRINCIPALNAME()
+
+	annotation PBI_Id = 6418ccb4d1564fc787fa399d94c5f06f
+

@@ -1,0 +1,54 @@
+table Dim_Customers
+	lineageTag: d2b5248c-b07d-45ce-b3d8-b7ecb7904150
+
+	column CustomerID
+		dataType: string
+		lineageTag: d75f2fa0-2bd9-4a53-bfcd-71c07e86593a
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		dataType: string
+		lineageTag: cd85ce44-06c5-4af0-9e4b-210b706da213
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Email
+		dataType: string
+		lineageTag: eff253ca-caeb-43f0-89e4-58b48736a13a
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	column Address
+		dataType: string
+		lineageTag: a072a29d-21d7-4fe2-959f-91035c37ef22
+		summarizeBy: none
+		sourceColumn: Address
+
+		annotation SummarizationSetBy = Automatic
+
+	column PhoneNumber
+		dataType: string
+		lineageTag: aad81a9a-a2bb-4e5d-9a87-b682e4190d21
+		summarizeBy: none
+		sourceColumn: PhoneNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Customers = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_Customers = Source{[Schema="dbo",Item="Dim_Customers"]}[Data]
+				in
+				    dbo_Dim_Customers
+
+	annotation PBI_ResultType = Table
+

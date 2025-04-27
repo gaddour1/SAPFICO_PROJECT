@@ -1,0 +1,66 @@
+table Dim_Payments_Supplier
+	lineageTag: 9b04b2c6-4fee-4586-8243-e9fa5f704fd5
+
+	column PaymentID
+		dataType: string
+		lineageTag: 32806572-261e-49b5-aab0-a2e71ad9e4b4
+		summarizeBy: none
+		sourceColumn: PaymentID
+
+		annotation SummarizationSetBy = Automatic
+
+	column SupplierFk
+		dataType: string
+		lineageTag: 852ee31d-2f43-4e89-8fd0-697cc0754648
+		summarizeBy: none
+		sourceColumn: SupplierFk
+
+		annotation SummarizationSetBy = Automatic
+
+	column InvoiceFk
+		dataType: string
+		lineageTag: 39f7912f-168f-49f6-9622-d19f432efac5
+		summarizeBy: none
+		sourceColumn: InvoiceFk
+
+		annotation SummarizationSetBy = Automatic
+
+	column PaymentDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: fff7bd6e-0f76-4bd7-a565-fdd6f8c85e7e
+		summarizeBy: none
+		sourceColumn: PaymentDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column GrandLivreFk
+		dataType: string
+		lineageTag: 9bd64d06-2f44-4208-8f23-54c58b4a1bf4
+		summarizeBy: none
+		sourceColumn: GrandLivreFk
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pk_PaymentSupplier
+		dataType: int64
+		formatString: 0
+		lineageTag: a135bbd4-7c3c-4cb8-944e-1a74dce2c60a
+		summarizeBy: sum
+		sourceColumn: Pk_PaymentSupplier
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Payments_Supplier = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_Payments_Supplier = Source{[Schema="dbo",Item="Dim_Payments_Supplier"]}[Data]
+				in
+				    dbo_Dim_Payments_Supplier
+
+	annotation PBI_ResultType = Table
+

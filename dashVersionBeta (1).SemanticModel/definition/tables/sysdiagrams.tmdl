@@ -1,0 +1,49 @@
+table sysdiagrams
+	lineageTag: b18160fd-ea80-40e5-a802-c67f891f0550
+
+	column name
+		dataType: string
+		lineageTag: 146a5079-4d25-4827-881a-0cb2e08fafa5
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column principal_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 31381736-9b74-4f2e-86c4-83efd9c5a661
+		summarizeBy: sum
+		sourceColumn: principal_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column diagram_id
+		dataType: int64
+		formatString: 0
+		lineageTag: f8456b0a-ae08-404a-a9b9-b4e2e18d4516
+		summarizeBy: sum
+		sourceColumn: diagram_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column version
+		dataType: int64
+		formatString: 0
+		lineageTag: 090c8b5e-e492-42fc-852d-050129e06783
+		summarizeBy: sum
+		sourceColumn: version
+
+		annotation SummarizationSetBy = Automatic
+
+	partition sysdiagrams = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_sysdiagrams = Source{[Schema="dbo",Item="sysdiagrams"]}[Data]
+				in
+				    dbo_sysdiagrams
+
+	annotation PBI_ResultType = Table
+

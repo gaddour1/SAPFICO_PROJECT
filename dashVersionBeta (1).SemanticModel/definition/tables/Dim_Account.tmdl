@@ -1,0 +1,39 @@
+table Dim_Account
+	lineageTag: 046aa477-c8c9-40db-8e42-e4c1752edff2
+
+	column Pk_Account
+		dataType: int64
+		formatString: 0
+		lineageTag: e1de1ad4-25fa-4ec9-a452-84e88d3b5b70
+		summarizeBy: none
+		sourceColumn: Pk_Account
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountID
+		dataType: string
+		lineageTag: 9212a299-0c87-40dd-b35e-a402ae3c4165
+		summarizeBy: none
+		sourceColumn: AccountID
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountName
+		dataType: string
+		lineageTag: e0a4f19e-5770-4e9a-a205-69798ee6a2ae
+		summarizeBy: none
+		sourceColumn: AccountName
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Account = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_Account = Source{[Schema="dbo",Item="Dim_Account"]}[Data]
+				in
+				    dbo_Dim_Account
+
+	annotation PBI_ResultType = Table
+

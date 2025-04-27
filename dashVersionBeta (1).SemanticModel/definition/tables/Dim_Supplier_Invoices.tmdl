@@ -1,0 +1,385 @@
+table Dim_Supplier_Invoices
+	lineageTag: eb8451ff-2be6-4f5c-a229-cfb5a2caf9b2
+
+	measure 'Retard Moyen Paiement' =
+			
+			AVERAGEX(
+			    'Dim_Supplier_Invoices',
+			    DATEDIFF(
+			        'Dim_Supplier_Invoices'[DueDate],
+			        'Dim_Supplier_Invoices'[PaymentDueDate],
+			        DAY
+			    )
+			)
+		lineageTag: b51e92c8-6582-4a6e-bb9b-d6ec154409c8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Late_Payment_Ratio =
+			
+			DIVIDE(
+			    CALCULATE(
+			        COUNTROWS('Dim_Supplier_Invoices'),
+			        FILTER(
+			            'Dim_Supplier_Invoices',
+			            'Dim_Supplier_Invoices'[Retard Moyen Paiement] > 0
+			        )
+			    ),
+			    COUNTROWS('Dim_Supplier_Invoices')
+			)
+		lineageTag: 1883f95d-4d1e-48a4-8bac-0dd4fbe8e780
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Paid_Ratio =
+			DIVIDE(
+			    CALCULATE(COUNTROWS('Dim_Supplier_Invoices'), 'Dim_Supplier_Invoices'[PaymentStatus]= "Paid"),
+			    COUNTROWS('Dim_Supplier_Invoices')
+			)
+		lineageTag: 7ee690de-67c0-480e-aadf-7e9cad29ce90
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Std_Payment_Delay = ```
+			STDEVX.P('Dim_Supplier_Invoices', 'Dim_Supplier_Invoices'[Retard Moyen Paiement])
+			
+			```
+		lineageTag: 239c0a45-5e13-4d58-85d5-ae2bfcedd980
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Total_Invoices = COUNTROWS('Dim_Supplier_Invoices')
+		formatString: 0
+		lineageTag: 6ac06869-c340-4344-bb73-d33158596219
+
+	measure TotalDisputes = COUNTROWS('Dim_Disputes')
+		formatString: 0
+		lineageTag: 12002163-a895-4e48-a9b8-ae1161f68d66
+
+	measure Partial_Payment_Ratio = ```
+			DIVIDE(
+			    CALCULATE(COUNTROWS('Dim_Supplier_Invoices'), 'Dim_Supplier_Invoices'[PaymentStatus] = "Overdue"),
+			    COUNTROWS('Dim_Supplier_Invoices')
+			)
+			
+			```
+		lineageTag: cb7857f0-81ba-408e-9ff0-4641247c67d9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Unpaid_Ratio = ```
+			DIVIDE(
+			    CALCULATE(COUNTROWS('Dim_Supplier_Invoices'), 'Dim_Supplier_Invoices'[PaymentStatus] = "Unpaid"),
+			    COUNTROWS('Dim_Supplier_Invoices')
+			)
+			
+			```
+		lineageTag: 1d96df62-35b7-419a-9b06-94ecbf4f9231
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Dispute_Intensity = 'Dim_Supplier_Invoices'[TotalDisputes] / 'Dim_Supplier_Invoices'[Total_Invoices]
+		lineageTag: 29386a59-06cd-45e1-bf91-a431655b0fa8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Payment_Consistency = 1 / (1 + 'Dim_Supplier_Invoices'[Std_Payment_Delay])
+		lineageTag: ca767a35-14f2-4ca1-9f5c-2545a0ae03ca
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure DisputeResolutionRate = ```
+			DIVIDE(
+			    CALCULATE(COUNTROWS('Dim_Disputes'), 'Dim_Disputes'[Status] = "Resolved"),
+			    COUNTROWS('Dim_Disputes')
+			)
+			
+			```
+		lineageTag: fcdb6ac4-f872-4186-b262-3b9208328eb5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure AvgDisputeDuration = ```
+			AVERAGEX(
+			    'Dim_Disputes',
+			    DATEDIFF('Dim_Disputes'[DisputeDate], 'Dim_Disputes'[ResolutionDate], DAY)
+			)
+			
+			```
+		lineageTag: c9c0ca53-7486-40e3-987b-3e60bd84dd4a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Financial_Risk_Score = ```
+			
+			    0.3 * 'Dim_Supplier_Invoices'[Unpaid_Ratio] +
+			    0.25 * 'Dim_Supplier_Invoices'[Late_Payment_Ratio] +
+			    0.15 * 'Dim_Supplier_Invoices'[Partial_Payment_Ratio] +
+			    0.1 * 'Dim_Supplier_Invoices'[Dispute_Intensity] +
+			    0.1 * (1 - 'Dim_Supplier_Invoices'[DisputeResolutionRate])
+			
+			```
+		lineageTag: 694874ae-fdce-42ae-9f51-3d019bfbec09
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure MaxRisk = 10
+		formatString: 0
+		lineageTag: 4d85c3b6-4adb-4de4-bc91-4dfcc33a26d0
+
+	measure Target = 4
+		formatString: 0
+		lineageTag: c9b0dbf4-f819-431a-a5c1-59ba83b3a1ae
+
+	measure MinRisk = 0
+		formatString: 0
+		lineageTag: a19b5b58-4023-4c12-bdf0-45ba77b83180
+
+	measure Likelihood_Score = ```
+			
+			    0.4 * 'Dim_Supplier_Invoices'[Unpaid_Ratio] +
+			    0.4 * 'Dim_Supplier_Invoices'[Late_Payment_Ratio] +
+			    0.2 * 'Dim_Supplier_Invoices'[Partial_Payment_Ratio]
+			
+			```
+		lineageTag: 912feb4c-268e-476b-81f0-83e18462ef0f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Impact_Score = ```
+			
+			    0.571 * 'Dim_Supplier_Invoices'[Dispute_Intensity] +
+			    0.429 * (1 - 'Dim_Supplier_Invoices'[DisputeResolutionRate])
+			
+			```
+		lineageTag: d618216a-4e3f-48df-929c-bf7657c91bfd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure OpenDisputes = ```
+			
+			CALCULATE(
+			    COUNTROWS('Dim_Disputes'),
+			    'Dim_Disputes'[Status] = "Ouvert"
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 8c124fbe-410d-4533-8bc4-209b787c379d
+
+	measure 'Totzl Disputes MoM' = ```
+			
+			VAR CurrentMonth = [TotalDisputes]
+			
+			VAR HasMonthContext = 
+			    HASONEVALUE(Dim_Date[Month]) && 
+			    HASONEVALUE(Dim_Date[Year])
+			
+			VAR p =
+			    IF(
+			        HasMonthContext,
+			        CALCULATE(
+			            [TotalDisputes],
+			            DATEADD(Dim_Date[date_id], -1, MONTH)
+			        )
+			    )
+			
+			VAR Difference = CurrentMonth - COALESCE(p, 0)
+			
+			VAR Arrow =
+			    SWITCH(
+			        TRUE(),
+			        Difference > 0, "▲",
+			        Difference < 0, "▼",
+			        "—"
+			    )
+			
+			RETURN
+			IF(
+			    HasMonthContext,
+			    Arrow & " " & FORMAT(Difference, "+#;-#;0"),
+			    FORMAT(CurrentMonth, "#,0")
+			)
+			
+			```
+		lineageTag: e54c8f91-0492-4fd2-b23d-a13edfe00ddf
+
+	measure 'Unresolved Disputes MoM Delta' = ```
+			
+			VAR CurrentMonth = [Unresolved Disputes]
+			
+			VAR HasMonthContext = 
+			    HASONEVALUE(Dim_Date[Month]) && 
+			    HASONEVALUE(Dim_Date[Year])
+			
+			VAR p =
+			    IF(
+			        HasMonthContext,
+			        CALCULATE(
+			            [Unresolved Disputes],
+			            DATEADD(Dim_Date[date_id], -1, MONTH)
+			        )
+			    )
+			
+			VAR Difference = CurrentMonth - COALESCE(p, 0)
+			
+			VAR Arrow =
+			    SWITCH(
+			        TRUE(),
+			        Difference > 0, "▲",
+			        Difference < 0, "▼",
+			        "—"
+			    )
+			
+			RETURN
+			IF(
+			    HasMonthContext,
+			    Arrow & " " & FORMAT(Difference, "+#;-#;0"),
+			    FORMAT(CurrentMonth, "#,0")
+			)
+			
+			```
+		lineageTag: 7c745de6-5aac-4b39-bfcc-320226bbd491
+
+	measure 'MoM Period' = ```
+			
+			VAR CurrentMonth = FORMAT(MAX(Dim_Date[date_id]), "[$-fr-FR]MMMM")
+			VAR p = FORMAT(EDATE(MAX(Dim_Date[date_id]), -1), "[$-fr-FR]MMMM")
+			RETURN 
+			CurrentMonth & " vs " & p
+			
+			```
+		lineageTag: 44e976b4-e602-45c1-9c5b-b0514599946c
+
+	column InvoiceID
+		dataType: string
+		lineageTag: c974f855-ff88-4b19-8a72-70b37c5d496f
+		summarizeBy: none
+		sourceColumn: InvoiceID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DueDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: afb26ed6-4782-4334-a42d-c133d1e8571e
+		summarizeBy: none
+		sourceColumn: DueDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PaymentStatus
+		dataType: string
+		lineageTag: c773cb52-d536-481e-9228-688d29f95226
+		summarizeBy: none
+		sourceColumn: PaymentStatus
+
+		annotation SummarizationSetBy = Automatic
+
+	column PaymentDueDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4e8ec38f-94e9-4e78-ad1f-c17f9f5fcf4b
+		summarizeBy: none
+		sourceColumn: PaymentDueDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Approved
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 201bdea0-4651-474c-8822-f706cddd5f2e
+		summarizeBy: none
+		sourceColumn: Approved
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pk_Supplier_Invoices
+		dataType: int64
+		formatString: 0
+		lineageTag: 4fa7293d-4e1b-487b-bd22-d43fad4f7986
+		summarizeBy: sum
+		sourceColumn: Pk_Supplier_Invoices
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Supplier
+		dataType: string
+		lineageTag: 457ce80b-304d-445a-bd39-95506de7d1ed
+		summarizeBy: none
+		sourceColumn: Fk_Supplier
+
+		annotation SummarizationSetBy = Automatic
+
+	column Likelihood_Level =
+			SWITCH(
+			    TRUE(),
+			    [Likelihood_Score] < 0.33, "Low",
+			    [Likelihood_Score] < 0.66, "Medium",
+			    "High"
+			)
+		lineageTag: 6b014e0b-a0ae-45fd-9459-d9d8adaa70e7
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Impact_Level =
+			SWITCH(
+			    TRUE(),
+			    [Impact_Score] < 0.33, "Low",
+			    [Impact_Score] < 0.66, "Medium",
+			    "High"
+			)
+		lineageTag: e3b8bd58-8d3e-4626-831e-dc1a34729b41
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Risk_Level = ```
+			
+			    SWITCH(
+			        TRUE(),
+			        [Likelihood_Level] = "High" && [Impact_Level] = "High", "Extreme Risk",
+			        [Likelihood_Level] = "Medium" && [Impact_Level] = "High", "High Risk",
+			        [Likelihood_Level] = "High" && [Impact_Level] = "Medium", "High Risk",
+			        [Likelihood_Level] = "Medium" && [Impact_Level] = "Medium", "Medium Risk",
+			        [Likelihood_Level] = "High" && [Impact_Level] = "Low", "Medium Risk",
+			        [Likelihood_Level] = "Low" && [Impact_Level] = "High", "Medium Risk",
+			        "Low Risk"
+			    )
+			
+			```
+		lineageTag: 052132a8-f4e0-42d8-b3b2-265d8766fe61
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Approved Status' = ```
+			
+			SWITCH(
+			    'Dim_Supplier_Invoices'[Approved],
+			    True, "Approved",
+			    False, "Not Approved",
+			    "Unknown Status" 
+			)
+			```
+		lineageTag: ffda22dd-f541-438e-8505-1797dc422c17
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Supplier_Invoices = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_Supplier_Invoices = Source{[Schema="dbo",Item="Dim_Supplier_Invoices"]}[Data]
+				in
+				    dbo_Dim_Supplier_Invoices
+
+	annotation PBI_ResultType = Table
+

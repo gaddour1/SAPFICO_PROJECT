@@ -1,0 +1,85 @@
+table Dim_Disputes
+	lineageTag: 8a134d9b-df7b-414b-917c-a0b3288ed27c
+
+	column DisputeID
+		dataType: string
+		lineageTag: 762f2e45-89ee-4c57-9212-e949f31bce52
+		summarizeBy: none
+		sourceColumn: DisputeID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DisputeDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 08ed4fa5-a329-43fe-95aa-bef2a9980e61
+		summarizeBy: none
+		sourceColumn: DisputeDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ResolutionDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0fcce6a0-5a0e-4d52-8efa-f99a6077f395
+		summarizeBy: none
+		sourceColumn: ResolutionDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Status
+		dataType: string
+		lineageTag: 14233f9e-2289-4865-972d-537a6c734ee4
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reason
+		dataType: string
+		lineageTag: d3dcecbe-0a27-4928-ac48-0746c1385372
+		summarizeBy: none
+		sourceColumn: Reason
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pk_Disputes
+		dataType: int64
+		formatString: 0
+		lineageTag: f74438c1-e8da-462f-9e82-f6450eb5fc98
+		summarizeBy: sum
+		sourceColumn: Pk_Disputes
+
+		annotation SummarizationSetBy = Automatic
+
+	column SupplierID
+		dataType: string
+		lineageTag: fbbfc7bf-1cb4-4f2d-ad12-662281b0d076
+		summarizeBy: none
+		sourceColumn: SupplierID
+
+		annotation SummarizationSetBy = Automatic
+
+	column InvoiceID
+		dataType: string
+		lineageTag: e4a4887e-f48e-413c-9d09-fd4d0878d2df
+		summarizeBy: none
+		sourceColumn: InvoiceID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Disputes = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_Disputes = Source{[Schema="dbo",Item="Dim_Disputes"]}[Data]
+				in
+				    dbo_Dim_Disputes
+
+	annotation PBI_ResultType = Table
+

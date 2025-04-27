@@ -1,0 +1,72 @@
+table Dim_Accounting_journal
+	lineageTag: 02a3ebd5-c6db-4fd0-993e-2751cd1835af
+
+	column pk_Entry
+		dataType: int64
+		formatString: 0
+		lineageTag: 53c47a6c-3d2e-4f1d-9c39-12fea115d7b4
+		summarizeBy: sum
+		sourceColumn: pk_Entry
+
+		annotation SummarizationSetBy = Automatic
+
+	column Entry_id
+		dataType: string
+		lineageTag: 120c6eb6-ab8e-48b7-8eae-1625af1829da
+		summarizeBy: none
+		sourceColumn: Entry_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column EntryDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4b81ef01-0a13-4295-8be4-255f3c9620c8
+		summarizeBy: none
+		sourceColumn: EntryDate
+
+		variation Variation
+			isDefault
+			relationship: d7f016a1-8496-4fa5-a339-0bd28222a55d
+			defaultHierarchy: LocalDateTable_885624eb-a63f-4a60-95cc-2977a94e9bd5.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ISValid
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 683cc268-8972-4de2-8f15-8eb5f7487da6
+		summarizeBy: none
+		sourceColumn: ISValid
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountFk
+		dataType: string
+		lineageTag: c9493ca2-c72c-4045-bd43-289f8ba6fdbc
+		summarizeBy: none
+		sourceColumn: AccountFk
+
+		annotation SummarizationSetBy = Automatic
+
+	column GrandLivreID
+		dataType: string
+		lineageTag: 7ad04db0-a70d-4536-af50-1b3c950efe61
+		summarizeBy: none
+		sourceColumn: GrandLivreID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Accounting_journal = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_Accounting_journal = Source{[Schema="dbo",Item="Dim_Accounting_journal"]}[Data]
+				in
+				    dbo_Dim_Accounting_journal
+
+	annotation PBI_ResultType = Table
+

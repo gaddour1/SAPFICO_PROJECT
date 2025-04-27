@@ -1,0 +1,320 @@
+table Fact_Fin_Interne
+	lineageTag: d182f3de-5aa2-4695-a3d0-3c8985aa85c5
+
+	measure Solvabilite = ```
+			DIVIDE(SUM('Fact_Etat_Financier'[TotalAssets]), SUM('Fact_Etat_Financier'[TotalLiabilities]))
+			
+			```
+		lineageTag: 0926d5b6-0d92-4714-8e8c-fa8027eb8a67
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure RatioEndettement = ```
+			DIVIDE(SUM('Fact_Etat_Financier'[TotalLiabilities]), SUM('Fact_Etat_Financier'[Equity]))
+			
+			```
+		lineageTag: 5ea21018-ec98-448c-8b7c-0b77c17cc36b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure EcartBudget = DIVIDE(SUM('Fact_Etat_Financier'[Budget]) - SUM('Fact_Etat_Financier'[ActualExpenses]), SUM('Fact_Etat_Financier'[Budget]))
+		lineageTag: 5d7e1c62-bace-4883-88e2-51b98f1e9932
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Solvabilite YoY Delta' = ```
+			
+			VAR CurrentYear = [Solvabilite]
+			
+			VAR HasYearContext =
+			    HASONEVALUE(Dim_date[year])
+			
+			VAR p = 
+			    CALCULATE(
+			        [Solvabilite],
+			        FILTER(
+			            ALL(Dim_date),
+			            Dim_date[year] = SELECTEDVALUE(Dim_date[year]) - 1
+			        )
+			    )
+			
+			VAR Difference = CurrentYear - COALESCE(p, 0)
+			
+			VAR Arrow =
+			    SWITCH(
+			        TRUE(),
+			        Difference > 0, "▲",
+			        Difference < 0, "▼",
+			        "—"
+			    )
+			
+			RETURN
+			IF(
+			    HasYearContext,
+			    Arrow & " " & FORMAT(Difference, "+0.00;-0.00;0.00"),
+			    FORMAT(CurrentYear, "0.00")
+			)
+			
+			```
+		lineageTag: 94bd2435-7010-4c5a-b7cb-fcc6eac0e857
+
+	measure 'EBITDA_EBE YoY Delta (%)' = ```
+			
+			VAR CurrentYear = SUM(Fact_Fin_Interne[EBITDA_EBE])
+			VAR HasYearContext = HASONEVALUE(Dim_date[year])
+			VAR p = 
+			    CALCULATE(
+			        SUM(Fact_Fin_Interne[EBITDA_EBE]),
+			        FILTER(
+			            ALL(Dim_date),
+			            Dim_date[year] = SELECTEDVALUE(Dim_date[year]) - 1
+			        )
+			    )
+			VAR DifferencePct = 
+			    IF(
+			        NOT ISBLANK(p),
+			        DIVIDE(CurrentYear, p) - 1,
+			        BLANK()
+			    )
+			VAR Arrow =
+			    SWITCH(
+			        TRUE(),
+			        DifferencePct > 0, "▲",
+			        DifferencePct < 0, "▼",
+			        "—"
+			    )
+			RETURN
+			IF(
+			    HasYearContext,
+			    IF(
+			        NOT ISBLANK(DifferencePct),
+			        Arrow & " " & FORMAT(DifferencePct, "+0%;-0%;0%"),
+			        FORMAT(CurrentYear, "0")
+			    ),
+			    FORMAT(CurrentYear, "0")
+			)
+			
+			```
+		lineageTag: b7a36944-f951-4904-9917-3c019ae2460a
+
+	measure 'Marge_Nette YoY Delta (%)' = ```
+			
+			VAR CurrentYear = SUM(Fact_Fin_Interne[Marge_Nette])
+			VAR HasYearContext = HASONEVALUE(Dim_date[year])
+			VAR p = 
+			    CALCULATE(
+			        SUM(Fact_Fin_Interne[Marge_Nette]),
+			        FILTER(
+			            ALL(Dim_date),
+			            Dim_date[year] = SELECTEDVALUE(Dim_date[year]) - 1
+			        )
+			    )
+			VAR DifferencePct = 
+			    IF(
+			        NOT ISBLANK(p),
+			        DIVIDE(CurrentYear, p) - 1,
+			        BLANK()
+			    )
+			VAR Arrow =
+			    SWITCH(
+			        TRUE(),
+			        DifferencePct > 0, "▲",
+			        DifferencePct < 0, "▼",
+			        "—"
+			    )
+			RETURN
+			IF(
+			    HasYearContext,
+			    IF(
+			        NOT ISBLANK(DifferencePct),
+			        Arrow & " " & FORMAT(DifferencePct, "+0%;-0%;0%"),
+			        FORMAT(CurrentYear, "0")
+			    ),
+			    FORMAT(CurrentYear, "0")
+			)
+			
+			```
+		lineageTag: b0c025fe-d3ae-4b1f-87d7-f8f9cd33f605
+
+	column fk_date
+		dataType: int64
+		formatString: 0
+		lineageTag: 9ac6ba0d-df40-4308-b31c-4f30d6a6b849
+		summarizeBy: sum
+		sourceColumn: fk_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_performance
+		dataType: int64
+		formatString: 0
+		lineageTag: 720c758f-4e30-4aba-bb6c-e46548d35ed3
+		summarizeBy: sum
+		sourceColumn: fk_performance
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_solvabilite
+		dataType: int64
+		formatString: 0
+		lineageTag: c0b2e05c-c316-427d-bc62-46bc17d8222d
+		summarizeBy: sum
+		sourceColumn: fk_solvabilite
+
+		annotation SummarizationSetBy = Automatic
+
+	column fk_rentabilite
+		dataType: int64
+		formatString: 0
+		lineageTag: 256aeb30-cb80-42a7-8a8f-12e3d2ba2995
+		summarizeBy: none
+		sourceColumn: fk_rentabilite
+
+		annotation SummarizationSetBy = Automatic
+
+	column Chiffre_d_affaires
+		dataType: decimal
+		formatString: #,0.###############\ "€";-#,0.###############\ "€";#,0.###############\ "€"
+		lineageTag: e7fe3352-5f16-46a1-b7df-3fbca2857db9
+		summarizeBy: sum
+		sourceColumn: Chiffre_d_affaires
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"fr-FR"}
+
+	column EBITDA_EBE
+		dataType: decimal
+		formatString: #,0.###############\ "€";-#,0.###############\ "€";#,0.###############\ "€"
+		lineageTag: 20ecf95b-d9d2-4fdb-a73a-edc0a8049734
+		summarizeBy: sum
+		sourceColumn: EBITDA_EBE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"fr-FR"}
+
+	column Marge_nette
+		dataType: decimal
+		formatString: #,0.###############\ "€";-#,0.###############\ "€";#,0.###############\ "€"
+		lineageTag: 1cd27db6-05cc-49eb-a8b1-451388785845
+		summarizeBy: sum
+		sourceColumn: Marge_nette
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"fr-FR"}
+
+	column Rentabilite_sur_fonds_propres
+		dataType: double
+		lineageTag: a892a483-7952-4004-9588-a88c3b7facf9
+		summarizeBy: sum
+		sourceColumn: Rentabilite_sur_fonds_propres
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Rentabilite_economique
+		dataType: double
+		lineageTag: e4750d4f-e3af-420d-ba7b-02a8e0e87804
+		summarizeBy: sum
+		sourceColumn: Rentabilite_economique
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Valeur_ajoutee
+		dataType: decimal
+		formatString: #,0.###############\ "€";-#,0.###############\ "€";#,0.###############\ "€"
+		lineageTag: 0a9779fd-2868-4fa2-9fd5-2293fc23eb5b
+		summarizeBy: sum
+		sourceColumn: Valeur_ajoutee
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"fr-FR"}
+
+	column Valeur_ajoutee__CA
+		dataType: decimal
+		formatString: #,0.###############\ "€";-#,0.###############\ "€";#,0.###############\ "€"
+		lineageTag: 224a53d8-2eb6-4adb-a937-995353d2bc59
+		summarizeBy: sum
+		sourceColumn: Valeur_ajoutee__CA
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"fr-FR"}
+
+	column Etat_des_dettes_a_1_an_au_plus
+		dataType: decimal
+		formatString: #,0.###############\ "€";-#,0.###############\ "€";#,0.###############\ "€"
+		lineageTag: 2a4ee338-58cf-4030-b474-5bff559bf951
+		summarizeBy: sum
+		sourceColumn: Etat_des_dettes_a_1_an_au_plus
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"fr-FR"}
+
+	column Liquidite_generale
+		dataType: double
+		lineageTag: 2e2f5fe0-d718-4df0-9b35-7a120055615a
+		summarizeBy: sum
+		sourceColumn: Liquidite_generale
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Fonds_propres
+		dataType: decimal
+		formatString: #,0.###############\ "€";-#,0.###############\ "€";#,0.###############\ "€"
+		lineageTag: 321dbd15-5d1d-4335-ad7e-5e4c5ca5f1b8
+		summarizeBy: sum
+		sourceColumn: Fonds_propres
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"fr-FR"}
+
+	partition Fact_Fin_Interne = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DW_EXTERNE"),
+				    dbo_Fact_Fin_Interne = Source{[Schema="dbo",Item="Fact_Fin_Interne"]}[Data],
+				    #"Valeur remplacée" = Table.ReplaceValue(dbo_Fact_Fin_Interne,".","",Replacer.ReplaceText,{"EBITDA_EBE"}),
+				    #"Valeur remplacée1" = Table.ReplaceValue(#"Valeur remplacée","K","000",Replacer.ReplaceText,{"EBITDA_EBE"}),
+				    #"Valeur remplacée2" = Table.ReplaceValue(#"Valeur remplacée1","K","000",Replacer.ReplaceText,{"Chiffre_d_affaires"}),
+				    #"Valeur remplacée3" = Table.ReplaceValue(#"Valeur remplacée2","M","000000",Replacer.ReplaceText,{"Chiffre_d_affaires"}),
+				    #"Type modifié" = Table.TransformColumnTypes(#"Valeur remplacée3",{{"Chiffre_d_affaires", Currency.Type}, {"EBITDA_EBE", Currency.Type}}),
+				    #"Valeur remplacée4" = Table.ReplaceValue(#"Type modifié",".","",Replacer.ReplaceText,{"Marge_nette"}),
+				    #"Valeur remplacée5" = Table.ReplaceValue(#"Valeur remplacée4","K","000",Replacer.ReplaceText,{"Marge_nette"}),
+				    #"Type modifié1" = Table.TransformColumnTypes(#"Valeur remplacée5",{{"Marge_nette", Currency.Type}}),
+				    #"Valeur remplacée6" = Table.ReplaceValue(#"Type modifié1",".","",Replacer.ReplaceText,{"Rentabilite_sur_fonds_propres"}),
+				    #"Type modifié2" = Table.TransformColumnTypes(#"Valeur remplacée6",{{"Rentabilite_sur_fonds_propres", type number}}),
+				    #"Valeur remplacée7" = Table.ReplaceValue(#"Type modifié2",".","",Replacer.ReplaceText,{"Rentabilite_economique"}),
+				    #"Type modifié3" = Table.TransformColumnTypes(#"Valeur remplacée7",{{"Rentabilite_economique", type number}}),
+				    #"Valeur remplacée8" = Table.ReplaceValue(#"Type modifié3",".","",Replacer.ReplaceText,{"Valeur_ajoutee"}),
+				    #"Valeur remplacée9" = Table.ReplaceValue(#"Valeur remplacée8","K","000",Replacer.ReplaceText,{"Valeur_ajoutee"}),
+				    #"Type modifié4" = Table.TransformColumnTypes(#"Valeur remplacée9",{{"Valeur_ajoutee", Currency.Type}}),
+				    #"Valeur remplacée10" = Table.ReplaceValue(#"Type modifié4",".","",Replacer.ReplaceText,{"Valeur_ajoutee__CA"}),
+				    #"Type modifié5" = Table.TransformColumnTypes(#"Valeur remplacée10",{{"Valeur_ajoutee__CA", Currency.Type}}),
+				    #"Valeur remplacée11" = Table.ReplaceValue(#"Type modifié5","M","000000",Replacer.ReplaceText,{"Etat_des_dettes_a_1_an_au_plus"}),
+				    #"Valeur remplacée12" = Table.ReplaceValue(#"Valeur remplacée11","K","000",Replacer.ReplaceText,{"Etat_des_dettes_a_1_an_au_plus"}),
+				    #"Valeur remplacée13" = Table.ReplaceValue(#"Valeur remplacée12",".","",Replacer.ReplaceText,{"Etat_des_dettes_a_1_an_au_plus"}),
+				    #"Type modifié6" = Table.TransformColumnTypes(#"Valeur remplacée13",{{"Etat_des_dettes_a_1_an_au_plus", Currency.Type}}),
+				    #"Valeur remplacée14" = Table.ReplaceValue(#"Type modifié6","K","000",Replacer.ReplaceText,{"Fonds_propres"}),
+				    #"Valeur remplacée15" = Table.ReplaceValue(#"Valeur remplacée14","M","000000",Replacer.ReplaceText,{"Fonds_propres"}),
+				    #"Valeur remplacée16" = Table.ReplaceValue(#"Valeur remplacée15",".","",Replacer.ReplaceText,{"Fonds_propres"}),
+				    #"Valeur remplacée17" = Table.ReplaceValue(#"Valeur remplacée16","77O000","770000",Replacer.ReplaceText,{"Fonds_propres"}),
+				    #"Type modifié7" = Table.TransformColumnTypes(#"Valeur remplacée17",{{"Fonds_propres", Currency.Type}})
+				in
+				    #"Type modifié7"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

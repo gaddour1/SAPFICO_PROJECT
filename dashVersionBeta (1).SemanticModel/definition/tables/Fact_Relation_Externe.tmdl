@@ -1,0 +1,172 @@
+table Fact_Relation_Externe
+	lineageTag: b4cf78c2-0ad7-48f9-a829-8e75847a1b93
+
+	measure Taux_Remise_Utilisée =
+			
+			DIVIDE(SUM('Fact_Relation_Externe'[DiscountUsed]), SUM('Fact_Relation_Externe'[DiscountOffered]))
+		lineageTag: 4c0c3f7d-615a-4419-a21f-8916a95ddb67
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Taux_Remise_Utilisée YoY' = ```
+			
+			VAR CurrentYear = [Taux_Remise_Utilisée]
+			
+			VAR HasYearContext =
+			    HASONEVALUE(Dim_date[year])
+			
+			VAR p = 
+			    CALCULATE(
+			        [Taux_Remise_Utilisée],
+			        FILTER(
+			            ALL(Dim_date),
+			            Dim_date[year] = SELECTEDVALUE(Dim_date[year]) - 1
+			        )
+			    )
+			
+			VAR Difference = CurrentYear - COALESCE(p, 0)
+			
+			VAR Arrow =
+			    SWITCH(
+			        TRUE(),
+			        Difference > 0, "▲",
+			        Difference < 0, "▼",
+			        "—"
+			    )
+			
+			RETURN
+			IF(
+			    HasYearContext,
+			    Arrow & " " & FORMAT(Difference, "+0.00;-0.00;0.00"),
+			    FORMAT(CurrentYear, "0.00")
+			)
+			
+			```
+		lineageTag: a76d4a0e-994c-49b7-b712-2f38116d04db
+
+	measure 'Payment Count' = COUNT(Fact_Relation_Externe[Fk_Payment_Supplier])
+		formatString: 0
+		lineageTag: f3bf049a-e69c-4bcb-b2f6-3f7c55c5c996
+
+	measure 'Total Disputes' = COUNTROWS(Dim_Disputes)
+		formatString: 0
+		lineageTag: a543ff4b-fc46-41d4-93c3-beb8b4e033a6
+
+	measure 'Total Invoices' =
+			
+			DISTINCTCOUNT(Dim_Supplier_Invoices[InvoiceID])
+		formatString: 0
+		lineageTag: b7a28065-83e4-4250-8111-6093ce24a5ec
+
+	measure 'Nombre Dettes Securise' =
+			
+			COUNTROWS(
+			    FILTER(
+			        'Dim_Grand_Livre',
+			        NOT(ISBLANK('Dim_Grand_Livre'[TransactionType])) &&
+			        CONTAINSSTRING('Dim_Grand_Livre'[TransactionType], "dette")
+			    )
+			)
+		formatString: 0
+		lineageTag: 3f790b32-a8b0-4bb2-bd9c-70c230e99ea7
+
+	measure 'Total Purchase Orders' = COUNTROWS(Dim_Purchase_Orders)
+		formatString: 0
+		lineageTag: 42054ef1-7f7e-463e-aeb7-51c4622032ed
+
+	column FK_Date_Resolution
+		dataType: int64
+		formatString: 0
+		lineageTag: cf6075f6-8397-4cd5-9b01-ae72ddb8f194
+		summarizeBy: sum
+		sourceColumn: FK_Date_Resolution
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Date_Debut
+		dataType: int64
+		formatString: 0
+		lineageTag: 6b0b285b-e1b5-4395-b1c6-d6634204522f
+		summarizeBy: none
+		sourceColumn: Fk_Date_Debut
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Payment_Supplier
+		dataType: int64
+		formatString: 0
+		lineageTag: 2f90d297-122b-48cc-ba21-362035550fd0
+		summarizeBy: none
+		sourceColumn: Fk_Payment_Supplier
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Supplier
+		dataType: int64
+		formatString: 0
+		lineageTag: 568a02b3-aaf0-46b3-8622-ef0d588ce293
+		summarizeBy: sum
+		sourceColumn: Fk_Supplier
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Dispute
+		dataType: int64
+		formatString: 0
+		lineageTag: 021684f4-4030-4b10-8169-502257ef7da4
+		summarizeBy: sum
+		sourceColumn: Fk_Dispute
+
+		annotation SummarizationSetBy = Automatic
+
+	column Order_total
+		dataType: double
+		lineageTag: 870659c3-00cf-431e-b608-2e2b69266f72
+		summarizeBy: sum
+		sourceColumn: Order_total
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Amount
+		dataType: double
+		lineageTag: f02b16b2-7df3-4bd9-90a6-218559e0ae39
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DiscountOffered
+		dataType: double
+		lineageTag: 73eb9aa7-388a-4462-8adf-5de77a21b5ca
+		summarizeBy: sum
+		sourceColumn: DiscountOffered
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DiscountUsed
+		dataType: double
+		lineageTag: ea62388e-f6df-4076-b09e-b79e94e4572c
+		summarizeBy: sum
+		sourceColumn: DiscountUsed
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Fact_Relation_Externe = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Fact_Relation_Externe = Source{[Schema="dbo",Item="Fact_Relation_Externe"]}[Data]
+				in
+				    dbo_Fact_Relation_Externe
+
+	annotation PBI_ResultType = Table
+

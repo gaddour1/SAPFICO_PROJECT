@@ -1,0 +1,31 @@
+table Dim_Rentabilité
+	lineageTag: c0cdeb60-8e5a-438b-9698-4b643b745d4c
+
+	column pk_rentabilite
+		dataType: int64
+		formatString: 0
+		lineageTag: b0695e21-c1f0-4773-b555-405ae03c079b
+		summarizeBy: none
+		sourceColumn: pk_rentabilite
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: string
+		lineageTag: ad193b0c-53b4-48f6-b275-2e6ac3012378
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Rentabilité = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DW_EXTERNE"),
+				    dbo_Dim_Rentabilité = Source{[Schema="dbo",Item="Dim_Rentabilité"]}[Data]
+				in
+				    dbo_Dim_Rentabilité
+
+	annotation PBI_ResultType = Table
+

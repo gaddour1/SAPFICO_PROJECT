@@ -1,0 +1,32 @@
+table 'Dim_date (2)'
+	lineageTag: 837ef98f-5dde-47d7-926b-682c5a7e61b5
+
+	column pk_date
+		dataType: int64
+		formatString: 0
+		lineageTag: ab3b4f2c-c6da-47df-9ecf-3ab0b693b511
+		summarizeBy: sum
+		sourceColumn: pk_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: ff574c1a-a94c-42b4-8177-92eec1831508
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim_date (2)' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DW_EXTERNE"),
+				    dbo_Dim_date = Source{[Schema="dbo",Item="Dim_date"]}[Data]
+				in
+				    dbo_Dim_date
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,66 @@
+table Dim_Purchase_Orders
+	lineageTag: 26abdc8e-b377-4d89-b1ee-0dce622cf137
+
+	column OrderID
+		dataType: string
+		lineageTag: d9399623-a32b-4d79-b8f1-6147cb148ca8
+		summarizeBy: none
+		sourceColumn: OrderID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Supplier
+		dataType: string
+		lineageTag: 7de16d57-9c1d-44ef-8b22-e498e4bba6fd
+		summarizeBy: none
+		sourceColumn: Fk_Supplier
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c0693a4c-518f-4b12-99e7-5cc7dfc61a14
+		summarizeBy: none
+		sourceColumn: OrderDate
+
+		variation Variation
+			isDefault
+			relationship: 4f18b94c-422e-48a2-8da5-cdba0ca4d15d
+			defaultHierarchy: LocalDateTable_e1feae75-cdcf-4509-b3a5-f9605d8d05aa.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Status
+		dataType: string
+		lineageTag: 12e568ea-aa9b-41c8-9ea6-1655b406be69
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pk_Orders
+		dataType: int64
+		formatString: 0
+		lineageTag: 18370675-602a-4302-a3f8-9d5627c183bc
+		summarizeBy: sum
+		sourceColumn: Pk_Orders
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Purchase_Orders = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_Purchase_Orders = Source{[Schema="dbo",Item="Dim_Purchase_Orders"]}[Data],
+				    #"Lignes filtrées" = Table.SelectRows(dbo_Dim_Purchase_Orders, each true)
+				in
+				    #"Lignes filtrées"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

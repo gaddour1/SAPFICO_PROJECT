@@ -1,0 +1,55 @@
+table Dim_Grand_Livre
+	lineageTag: 697b588b-de72-4f25-bd87-46d0029b8d40
+
+	column pk_grand_livre
+		dataType: int64
+		formatString: 0
+		lineageTag: a8af7364-0f41-4d57-8ecb-d2fd0a7f6e6f
+		summarizeBy: none
+		sourceColumn: pk_grand_livre
+
+		annotation SummarizationSetBy = Automatic
+
+	column GrandLivreID
+		dataType: string
+		lineageTag: 3f18b9da-ea31-40e8-9686-b884be84551c
+		summarizeBy: none
+		sourceColumn: GrandLivreID
+
+		annotation SummarizationSetBy = Automatic
+
+	column TransactionDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 360b622e-9114-40ae-825c-8d332c020a05
+		summarizeBy: none
+		sourceColumn: TransactionDate
+
+		variation Variation
+			isDefault
+			relationship: 699b6563-d1bd-4a9d-b069-7179b442b1f2
+			defaultHierarchy: LocalDateTable_ae4fb3a0-fffd-4c77-a20e-1c81259724d7.'Hiérarchie de dates'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TransactionType
+		dataType: string
+		lineageTag: 2b473ad8-e20f-44ef-9266-3059ebc0dcd3
+		summarizeBy: none
+		sourceColumn: TransactionType
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Grand_Livre = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_Grand_Livre = Source{[Schema="dbo",Item="Dim_Grand_Livre"]}[Data]
+				in
+				    dbo_Dim_Grand_Livre
+
+	annotation PBI_ResultType = Table
+

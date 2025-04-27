@@ -1,0 +1,55 @@
+table Dim_geo
+	lineageTag: d90f71a6-02fd-4e62-acb8-81d7a7c5ee4f
+
+	column Pk_geo
+		dataType: int64
+		formatString: 0
+		lineageTag: 71f11ecf-a623-432a-9a17-a57d63a2e8dd
+		summarizeBy: none
+		sourceColumn: Pk_geo
+
+		annotation SummarizationSetBy = Automatic
+
+	column NumRue
+		dataType: string
+		lineageTag: 4ccc8dce-7205-461e-b920-a35cbd3ea2b2
+		summarizeBy: none
+		sourceColumn: NumRue
+
+		annotation SummarizationSetBy = Automatic
+
+	column Rue
+		dataType: string
+		lineageTag: fbe4a07c-b396-4458-9e6c-b0bfb558464a
+		summarizeBy: none
+		sourceColumn: Rue
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ville
+		dataType: string
+		lineageTag: cd23941d-3e55-4b70-9c7a-05d508177a5f
+		summarizeBy: none
+		sourceColumn: Ville
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pays
+		dataType: string
+		lineageTag: 222af674-682b-4f0a-ac64-d34ea0e83590
+		summarizeBy: none
+		sourceColumn: Pays
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_geo = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_geo = Source{[Schema="dbo",Item="Dim_geo"]}[Data]
+				in
+				    dbo_Dim_geo
+
+	annotation PBI_ResultType = Table
+

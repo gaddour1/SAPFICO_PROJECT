@@ -1,0 +1,39 @@
+table Dim_Invoice_Items
+	lineageTag: 0d732a2d-43b7-44ea-9676-3bf291898fb3
+
+	column InvoiceItemID
+		dataType: string
+		lineageTag: abd1ab77-9d0b-45c3-a87e-d4d94d5f8896
+		summarizeBy: none
+		sourceColumn: InvoiceItemID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pk_Invoice_Items
+		dataType: int64
+		formatString: 0
+		lineageTag: ad45cd00-7ea6-4fda-b939-cbfa1295c869
+		summarizeBy: sum
+		sourceColumn: Pk_Invoice_Items
+
+		annotation SummarizationSetBy = Automatic
+
+	column InvoiceID
+		dataType: string
+		lineageTag: 881b912c-2893-418c-ba99-5c4c8239ac9f
+		summarizeBy: none
+		sourceColumn: InvoiceID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Invoice_Items = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_Invoice_Items = Source{[Schema="dbo",Item="Dim_Invoice_Items"]}[Data]
+				in
+				    dbo_Dim_Invoice_Items
+
+	annotation PBI_ResultType = Table
+

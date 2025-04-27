@@ -1,0 +1,32 @@
+table 'Dim_G_Solvabilité (2)'
+	lineageTag: 556c903b-8562-450e-9127-52aebd5590d0
+
+	column pk_solvabilite
+		dataType: int64
+		formatString: 0
+		lineageTag: c323adec-fb1d-4df6-a953-1a893d247c18
+		summarizeBy: sum
+		sourceColumn: pk_solvabilite
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 5ef0c674-4979-4a62-9dc0-4518f967cbe7
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim_G_Solvabilité (2)' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DW_EXTERNE"),
+				    dbo_Dim_G_Solvabilité = Source{[Schema="dbo",Item="Dim_G_Solvabilité"]}[Data]
+				in
+				    dbo_Dim_G_Solvabilité
+
+	annotation PBI_ResultType = Table
+

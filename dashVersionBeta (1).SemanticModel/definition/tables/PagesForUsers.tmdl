@@ -1,0 +1,41 @@
+table PagesForUsers
+	lineageTag: 418228c4-c3bf-4ea3-bf86-433ea46cd7da
+
+	measure 'User Logged In' = USERPRINCIPALNAME()
+		lineageTag: 99df4088-309a-4a4f-b757-7eac07a46cde
+
+	column User
+		lineageTag: 37a82d8d-3a4d-45d2-a834-63e86efc7cfc
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [User]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Page
+		lineageTag: a303abcd-54cb-4e1c-8af4-9a22b66d9f16
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Page]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PagesForUsers = calculated
+		mode: import
+		source = ```
+				
+				DATATABLE(
+				    "User", STRING,
+				    "Page", STRING,
+				    {
+				        {"daf@entreprise.com", "Page Finances"},
+				        {"supplier@entreprise.com", "Page Fournisseurs"},
+				        {"Aya.Arfaoui@esprit.tn", "Page Risques"},
+				        {"Aya.Arfaoui@esprit.tn", "Home"}
+				    }
+				)
+				
+				```
+
+	annotation PBI_Id = d00f52bc2cee42b5a142183d28e35f49
+

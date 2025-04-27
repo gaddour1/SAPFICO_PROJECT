@@ -1,0 +1,192 @@
+relationship d7f016a1-8496-4fa5-a339-0bd28222a55d
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Accounting_journal.EntryDate
+	toColumn: LocalDateTable_885624eb-a63f-4a60-95cc-2977a94e9bd5.Date
+
+relationship ed10a60e-4e0d-4451-b64c-1dc5d0545a90
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_date.date_id
+	toColumn: LocalDateTable_fffd1f41-514a-4364-a0d8-9df424af368e.Date
+
+relationship 699b6563-d1bd-4a9d-b069-7179b442b1f2
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Grand_Livre.TransactionDate
+	toColumn: LocalDateTable_ae4fb3a0-fffd-4c77-a20e-1c81259724d7.Date
+
+relationship 4f18b94c-422e-48a2-8da5-cdba0ca4d15d
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Purchase_Orders.OrderDate
+	toColumn: LocalDateTable_e1feae75-cdcf-4509-b3a5-f9605d8d05aa.Date
+
+relationship AutoDetected_76a85f92-04ee-4871-bed8-0ebb7dc95cbb
+	fromColumn: Dim_Accounting_journal.GrandLivreID
+	toColumn: Dim_Grand_Livre.GrandLivreID
+
+relationship AutoDetected_b64b08a0-e569-4b90-bd75-5fccce77df8a
+	fromColumn: Dim_Disputes.SupplierID
+	toColumn: Dim_Suppliers.SupplierID
+
+relationship AutoDetected_ee0cea7c-3a57-4a34-a848-01780802c4c6
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Fact_Relation_Externe.Fk_Payment_Supplier
+	toColumn: Fact_Etat_Financier.Fk_Payment_Supplier
+
+relationship AutoDetected_b7048162-c938-4391-80fe-035695925128
+	fromColumn: Dim_Accounting_journal.AccountFk
+	toColumn: Dim_Account.AccountID
+
+relationship AutoDetected_56e87d5b-4319-45ac-b574-99e11f2a9f60
+	fromColumn: Dim_Payments_Supplier.GrandLivreFk
+	toColumn: Dim_Grand_Livre.GrandLivreID
+
+relationship AutoDetected_19445eef-32d4-4870-8334-72f468d46796
+	fromColumn: Dim_Payments_Supplier.SupplierFk
+	toColumn: Dim_Suppliers.SupplierID
+
+relationship AutoDetected_2d34efaa-18f3-443e-aa28-5915fb3efeab
+	fromColumn: Dim_Purchase_Orders.Fk_Supplier
+	toColumn: Dim_Suppliers.SupplierID
+
+relationship AutoDetected_11ec8b65-b665-4f3f-90aa-bbe6740755c7
+	fromColumn: Dim_Supplier_Invoices.Fk_Supplier
+	toColumn: Dim_Suppliers.SupplierID
+
+relationship AutoDetected_49ec05dc-4479-41df-a798-590772a4ac04
+	fromColumn: Dim_Suppliers.Fk_geo
+	toColumn: Dim_geo.Pk_geo
+
+relationship AutoDetected_9214ef07-aceb-480f-8a5b-bec062daebf8
+	fromColumn: Fact_Etat_Financier.Fk_GrandLivre
+	toColumn: Dim_Grand_Livre.pk_grand_livre
+
+relationship AutoDetected_d75c5908-1c31-4ffe-ab50-fc0573fe8a75
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Dim_Payments_Supplier.Pk_PaymentSupplier
+	toColumn: Fact_Etat_Financier.Fk_Payment_Supplier
+
+relationship AutoDetected_c2c2318a-fd7c-402e-84c4-8f2c7d96b0b5
+	fromColumn: Fact_Etat_Financier.Fk_Suppliers
+	toColumn: Dim_Suppliers.Pk_Suppliers
+
+relationship AutoDetected_1102450f-f77c-423b-9aae-2e713938a778
+	isActive: false
+	fromColumn: Fact_Etat_Financier.Fk_supplier_Invoices
+	toColumn: Dim_Supplier_Invoices.Pk_Supplier_Invoices
+
+relationship b4de5abd-072c-d59d-0041-38c7df14f075
+	fromColumn: Dim_Purchase_Orders.Fk_Supplier
+	toColumn: supplier_risk_management.Fk_Supplier
+
+relationship e2609f32-b356-7ac5-b93a-becaeddfa46d
+	fromColumn: Dim_Payments_Supplier.SupplierFk
+	toColumn: supplier_risk_management.Fk_Supplier
+
+relationship d298444f-140e-3b72-93fd-c13f12ef4127
+	fromColumn: Dim_Supplier_Invoices.DueDate
+	toColumn: Dim_date.date_id
+
+relationship 75355c35-0663-961a-7df0-8a00762bfee1
+	isActive: false
+	fromColumn: Dim_Supplier_Invoices.PaymentDueDate
+	toColumn: Dim_date.date_id
+
+relationship 27f57e33-f180-4581-3594-5286e711846d
+	fromColumn: Dim_Disputes.DisputeDate
+	toColumn: Dim_date.date_id
+
+relationship 86701797-3067-f8e2-b48f-031eaaf66b13
+	isActive: false
+	fromColumn: Dim_Disputes.ResolutionDate
+	toColumn: Dim_date.date_id
+
+relationship 95c716b2-cd17-b052-e725-742d6540f65b
+	fromColumn: Dim_Payments_Supplier.PaymentDate
+	toColumn: Dim_date.date_id
+
+relationship AutoDetected_79d8b996-27da-4ab1-bae6-6e82461c48be
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Fact_Fin_Interne.fk_rentabilite
+	toColumn: Dim_Rentabilité.pk_rentabilite
+
+relationship AutoDetected_4f738787-954f-4f69-a4f1-18d6ef365345
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Fact_Fin_Interne.fk_solvabilite
+	toColumn: 'Dim_G_Solvabilité (2)'.pk_solvabilite
+
+relationship AutoDetected_aa9ef392-a7ee-41f4-8fc7-594dc4c10e5a
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Fact_Fin_Interne.fk_performance
+	toColumn: Dim_Eprise_Performance.pk_performance
+
+relationship AutoDetected_3b988852-3b7f-445f-b2c0-18220b94638b
+	isActive: false
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Fact_Fin_Interne.fk_performance
+	toColumn: 'Dim_Eprise_Performance (2)'.pk_performance
+
+relationship 373cb8c6-6252-07b6-8825-c9252d8e0e1a
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Dim_date (2)'.year
+	toColumn: Dim_Eprise_Performance.year
+
+relationship 397575da-41a3-58c2-9425-dea96100ac59
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Dim_date (2)'.year
+	toColumn: Dim_Rentabilité.year
+
+relationship 1c34bcf8-d539-9146-8561-44ecb12551ee
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Dim_date (2)'.year
+	toColumn: 'Dim_G_Solvabilité (2)'.year
+
+relationship 4002a405-b8e0-dc58-0625-e732ab0f4824
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Dim_date (2)'.year
+	toColumn: 'Dim_Eprise_Performance (2)'.year
+
+relationship 0e14709c-3062-fb39-8ee2-c9b88077174a
+	fromColumn: Fact_Relation_Externe.Fk_Date_Debut
+	toColumn: Dim_date.pk_date
+
+relationship 75f06667-806d-ea57-d9eb-cc9fefcb7fc8
+	isActive: false
+	fromColumn: Fact_Relation_Externe.FK_Date_Resolution
+	toColumn: Dim_date.pk_date
+
+relationship 32fe5606-9fbd-e284-7f41-451e877414b6
+	fromColumn: Dim_date.year
+	toColumn: Dim_Eprise_Performance.year
+
+relationship a286cc22-e870-7069-f769-5380826887d8
+	isActive: false
+	fromColumn: Dim_date.year
+	toColumn: 'Dim_Eprise_Performance (2)'.year
+
+relationship f21f099e-bb1d-8b06-62f2-623e764a49fb
+	isActive: false
+	fromColumn: Dim_date.year
+	toColumn: Dim_Rentabilité.year
+
+relationship 045c6d4b-b2fd-5158-2c4a-a38c2a97a058
+	isActive: false
+	fromColumn: Dim_date.year
+	toColumn: 'Dim_G_Solvabilité (2)'.year
+
+relationship bf6388ed-88d0-dc78-d9df-603ae811f3df
+	isActive: false
+	fromColumn: Dim_date.year
+	toColumn: Fact_Fin_Interne.fk_date
+

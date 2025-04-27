@@ -1,0 +1,477 @@
+table Fact_Etat_Financier
+	lineageTag: 23be6034-3d2f-4867-9fc9-797dd69a106b
+
+	measure 'Unresolved Disputes' =
+			
+			CALCULATE(
+			    COUNTROWS('Dim_Disputes'),
+			    'Dim_Disputes'[Status] = "Ouvert"
+			)
+		formatString: 0
+		lineageTag: 3b0e1f9d-c540-4b38-9d2c-ec6a8d49262d
+
+	measure 'Unpaid Rate' =
+			DIVIDE(
+			    CALCULATE(COUNTROWS('Dim_Supplier_Invoices'), 'Dim_Supplier_Invoices'[PaymentStatus] = "Unpaid"),
+			    COUNTROWS('Dim_Supplier_Invoices')
+			)
+		lineageTag: 64b727a0-fbb8-421c-821f-4d7b7dd15765
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure PaymentDelay =
+			
+			AVERAGEX(
+			    'Dim_Supplier_Invoices',
+			    DATEDIFF(
+			        'Dim_Supplier_Invoices'[DueDate],
+			        'Dim_Supplier_Invoices'[PaymentDueDate],
+			        DAY
+			    )
+			)
+		lineageTag: bb87ebb1-1dbc-4b0a-bdb3-74ddd01127b6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Moyenne_Profit = AVERAGE(Fact_Etat_Financier[RecommendedProfitMargin])
+		lineageTag: 3adbf269-dd00-4227-94e6-119e997ee75e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'ActualExpenses YoY avec Flèches' = ```
+			
+			VAR CurrentYearValue = 
+			    SUM('Fact_Etat_Financier'[ActualExpenses])
+			
+			VAR HasYearContext = 
+			    HASONEVALUE(Dim_date[year])
+			
+			VAR PreviousYearValue = 
+			    CALCULATE(
+			        SUM('Fact_Etat_Financier'[ActualExpenses]),
+			        FILTER(
+			            ALL(Dim_date),
+			            Dim_date[year] = SELECTEDVALUE(Dim_date[year]) - 1
+			        )
+			    )
+			
+			VAR Difference = CurrentYearValue - COALESCE(PreviousYearValue, 0)
+			
+			VAR Arrow =
+			    SWITCH(
+			        TRUE(),
+			        Difference > 0, " ▲",
+			        Difference < 0, " ▼",
+			        " —"
+			    )
+			
+			VAR NumericValue = 
+			    IF(
+			        HasYearContext,
+			        Difference,
+			        CurrentYearValue
+			    )
+			
+			RETURN
+			    FORMAT(NumericValue, "#,0") & Arrow
+			
+			```
+		lineageTag: ae40324b-0c8b-4cd1-87c1-0f3518575d82
+
+	measure TotalAmounts = SUM(Fact_Etat_Financier[Amount])
+		lineageTag: a76ac64b-41d4-4854-bce3-cb820a6a42eb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Moyenne_Profit MoM' = ```
+			
+			VAR CurrentMonthValue = 
+			    AVERAGE(Fact_Etat_Financier[RecommendedProfitMargin])
+			
+			VAR HasMonthContext = 
+			    HASONEVALUE(Dim_date[year]) &&
+			    HASONEVALUE(Dim_date[month])
+			
+			VAR PreviousMonthValue =
+			    CALCULATE(
+			        AVERAGE(Fact_Etat_Financier[RecommendedProfitMargin]),
+			        DATEADD(Dim_date[date_id], -1, MONTH)
+			    )
+			
+			VAR Difference = CurrentMonthValue - COALESCE(PreviousMonthValue, 0)
+			
+			VAR Arrow =
+			    SWITCH(
+			        TRUE(),
+			        Difference > 0, " ▲",
+			        Difference < 0, " ▼",
+			        " —"
+			    )
+			
+			VAR NumericValue = 
+			    IF(
+			        HasMonthContext,
+			        Difference,
+			        CurrentMonthValue
+			    )
+			
+			RETURN
+			    FORMAT(NumericValue, "#,0.00") & Arrow
+			
+			```
+		lineageTag: 627f0776-1329-4288-a93b-70369df6b964
+
+	measure 'PaymentDelay MoM' = ```
+			
+			VAR CurrentMonth = [Retard Moyen Paiement]
+			
+			VAR HasMonthContext = 
+			    HASONEVALUE(Dim_Date[Month]) && 
+			    HASONEVALUE(Dim_Date[Year])
+			
+			VAR p =
+			    IF(
+			        HasMonthContext,
+			        CALCULATE(
+			            [Retard Moyen Paiement],
+			            DATEADD(Dim_Date[date_id], -1, MONTH)
+			        )
+			    )
+			
+			VAR Difference = CurrentMonth - COALESCE(p, 0)
+			
+			VAR Arrow =
+			    SWITCH(
+			        TRUE(),
+			        Difference > 0, "▲",
+			        Difference < 0, "▼",
+			        "—"
+			    )
+			
+			RETURN
+			IF(
+			    HasMonthContext,
+			    Arrow & " " & FORMAT(Difference, "+#;-#;0"),
+			    FORMAT(CurrentMonth, "#,0")
+			)
+			
+			```
+		lineageTag: cfbadd7c-4c59-4a60-a699-3451c1c1ecf3
+
+	column Fk_GrandLivre
+		dataType: int64
+		formatString: 0
+		lineageTag: 129f3e11-ddec-4df7-9e8f-3942a4f83c55
+		summarizeBy: none
+		sourceColumn: Fk_GrandLivre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Orders
+		dataType: int64
+		formatString: 0
+		lineageTag: 86646e7e-bc29-48b1-b4a9-8335cef9bc70
+		summarizeBy: sum
+		sourceColumn: Fk_Orders
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Payment_date
+		dataType: int64
+		formatString: 0
+		lineageTag: 605e62e6-f2f6-47b7-93c4-9e729dd1d526
+		summarizeBy: sum
+		sourceColumn: Fk_Payment_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Payment_Supplier
+		dataType: int64
+		formatString: 0
+		lineageTag: bcf9d592-67df-43b4-876a-fdef6245612b
+		summarizeBy: none
+		sourceColumn: Fk_Payment_Supplier
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Accounts
+		dataType: int64
+		formatString: 0
+		lineageTag: 849a4acb-4485-416e-9276-cb186482b63e
+		summarizeBy: sum
+		sourceColumn: Fk_Accounts
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_EntryDate
+		dataType: int64
+		formatString: 0
+		lineageTag: 2d993177-2309-469d-acc7-ef19b46817bd
+		summarizeBy: sum
+		sourceColumn: Fk_EntryDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Entry
+		dataType: int64
+		formatString: 0
+		lineageTag: 45b98de8-8e4b-4fed-9a4f-6013abaf95f0
+		summarizeBy: sum
+		sourceColumn: Fk_Entry
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_supplier_Invoices
+		dataType: int64
+		formatString: 0
+		lineageTag: bfba6d95-00fc-4a3b-8084-70fe8781c00c
+		summarizeBy: sum
+		sourceColumn: Fk_supplier_Invoices
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_PaymentDueDate
+		dataType: int64
+		formatString: 0
+		lineageTag: 5524f126-d63c-424b-8228-f5cf09094f37
+		summarizeBy: sum
+		sourceColumn: Fk_PaymentDueDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Duedate
+		dataType: int64
+		formatString: 0
+		lineageTag: e440d371-8449-4f6e-8464-4a0bac26d54c
+		summarizeBy: sum
+		sourceColumn: Fk_Duedate
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_Suppliers
+		dataType: int64
+		formatString: 0
+		lineageTag: 7ebb9932-8ee3-4085-9618-fa5e2c411480
+		summarizeBy: none
+		sourceColumn: Fk_Suppliers
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_TransactionDate
+		dataType: int64
+		formatString: 0
+		lineageTag: b581d4c0-8973-486c-95bf-3c6d97bcf4eb
+		summarizeBy: sum
+		sourceColumn: Fk_TransactionDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column Amount
+		dataType: double
+		lineageTag: 3678314b-1a5b-4ce1-825e-2eac1ab3c552
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column RecommendedProfitMargin
+		dataType: double
+		lineageTag: 7d7e66ca-2474-4f38-b166-578eab548256
+		summarizeBy: sum
+		sourceColumn: RecommendedProfitMargin
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Total_Amount
+		dataType: double
+		lineageTag: 522bd185-c65b-4ec7-98be-b5b3afeea6bc
+		summarizeBy: sum
+		sourceColumn: Total_Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Unit_Price
+		dataType: double
+		lineageTag: 0b043201-494d-4a9d-920a-c3cac09ce8a9
+		summarizeBy: sum
+		sourceColumn: Unit_Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Total_Price
+		dataType: double
+		lineageTag: cd668418-91cc-45ee-98cc-45740691d355
+		summarizeBy: sum
+		sourceColumn: Total_Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DebitAmount
+		dataType: double
+		lineageTag: a8510026-0e1b-44cd-ae6e-cf334dce5b39
+		summarizeBy: sum
+		sourceColumn: DebitAmount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CreditAmount
+		dataType: double
+		lineageTag: 8f1e3ac9-10cf-4c76-8ee7-a84d1dd79d12
+		summarizeBy: sum
+		sourceColumn: CreditAmount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column AmountDue
+		dataType: double
+		lineageTag: 643bb58b-172c-47dd-8a45-f7b76764338e
+		summarizeBy: sum
+		sourceColumn: AmountDue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column AmountPaid
+		dataType: double
+		lineageTag: c3e51e92-c67f-4cd6-907e-e0582e422407
+		summarizeBy: sum
+		sourceColumn: AmountPaid
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column AmountBalance
+		dataType: double
+		lineageTag: cae65fbd-45bb-475e-ad8c-7c8ac77830f4
+		summarizeBy: sum
+		sourceColumn: AmountBalance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TotalAssets
+		dataType: double
+		lineageTag: f08330e9-b1c8-42f7-9bad-57b256928f79
+		summarizeBy: sum
+		sourceColumn: TotalAssets
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TotalLiabilities
+		dataType: double
+		lineageTag: 955a78ba-b88d-4ef1-9119-eeb8d5e57510
+		summarizeBy: sum
+		sourceColumn: TotalLiabilities
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Equity
+		dataType: double
+		lineageTag: 60e841bc-414c-4044-abd4-fd05de3a26fa
+		summarizeBy: sum
+		sourceColumn: Equity
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Budget
+		dataType: double
+		lineageTag: 9c5a6801-a9a6-40f7-aa71-3beceaef18de
+		summarizeBy: sum
+		sourceColumn: Budget
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ActualExpenses
+		dataType: double
+		lineageTag: e823f809-3450-454e-a293-c9d131dcdd24
+		summarizeBy: sum
+		sourceColumn: ActualExpenses
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column VATRate
+		dataType: double
+		lineageTag: 19d270db-914e-4b94-9843-303cd5d89c4a
+		summarizeBy: sum
+		sourceColumn: VATRate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SupplierPrice
+		dataType: double
+		lineageTag: b3da1aab-43c7-4461-8c77-e7626ebf3b6d
+		summarizeBy: sum
+		sourceColumn: SupplierPrice
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Order_Total
+		dataType: double
+		lineageTag: e01efee4-358c-44ca-9361-87c2cd5623a0
+		summarizeBy: sum
+		sourceColumn: Order_Total
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 008f8d3f-353b-4248-9638-7013d88e7f36
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Etat_Financier = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Fact_Etat_Financier = Source{[Schema="dbo",Item="Fact_Etat_Financier"]}[Data],
+				    #"Valeur remplacée" = Table.ReplaceValue(dbo_Fact_Etat_Financier,0,null,Replacer.ReplaceValue,{"Fk_Orders"}),
+				    #"Valeur remplacée1" = Table.ReplaceValue(#"Valeur remplacée",0,null,Replacer.ReplaceValue,{"Fk_Accounts"}),
+				    #"Valeur remplacée2" = Table.ReplaceValue(#"Valeur remplacée1",0,null,Replacer.ReplaceValue,{"Fk_EntryDate"}),
+				    #"Valeur remplacée3" = Table.ReplaceValue(#"Valeur remplacée2",0,null,Replacer.ReplaceValue,{"Fk_Entry"}),
+				    #"Valeur remplacée4" = Table.ReplaceValue(#"Valeur remplacée3",0,null,Replacer.ReplaceValue,{"Fk_PaymentDueDate"}),
+				    #"Valeur remplacée5" = Table.ReplaceValue(#"Valeur remplacée4",0,null,Replacer.ReplaceValue,{"Fk_Duedate"}),
+				    #"Colonnes supprimées" = Table.RemoveColumns(#"Valeur remplacée5",{"Pk_Fact"})
+				in
+				    #"Colonnes supprimées"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

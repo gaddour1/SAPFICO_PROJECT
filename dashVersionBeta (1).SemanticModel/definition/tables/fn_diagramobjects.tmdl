@@ -1,0 +1,25 @@
+table fn_diagramobjects
+	lineageTag: 481c3801-0e5b-4926-a841-4de7551032b6
+
+	column fn_diagramobjects
+		dataType: double
+		lineageTag: 4ee82036-30cf-4356-93f0-e0aedaa1b1d8
+		summarizeBy: sum
+		sourceColumn: fn_diagramobjects
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition fn_diagramobjects = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_fn_diagramobjects = Source{[Schema="dbo",Item="fn_diagramobjects"]}[Data],
+				    #"Fonction appeléedbo_fn_diagramobjects1" = dbo_fn_diagramobjects()
+				in
+				    #"Fonction appeléedbo_fn_diagramobjects1"
+
+	annotation PBI_ResultType = Number
+

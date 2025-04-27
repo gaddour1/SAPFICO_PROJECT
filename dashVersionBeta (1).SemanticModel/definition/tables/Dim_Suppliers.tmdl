@@ -1,0 +1,59 @@
+table Dim_Suppliers
+	lineageTag: 53b0d788-61e2-4183-b025-0f64132a6b4b
+
+	column SupplierID
+		dataType: string
+		lineageTag: 0c183c0c-39fd-4c79-9c02-91176f4add2b
+		summarizeBy: none
+		sourceColumn: SupplierID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		dataType: string
+		lineageTag: d0f4082b-7e99-4f55-8668-62019a55d823
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Email
+		dataType: string
+		lineageTag: 5855b5a0-c4ba-4a7f-aeef-17a000d7c53d
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fk_geo
+		dataType: int64
+		formatString: 0
+		lineageTag: 25a10302-4cf5-4770-a99c-b9f9abcc8720
+		summarizeBy: none
+		sourceColumn: Fk_geo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pk_Suppliers
+		dataType: int64
+		formatString: 0
+		lineageTag: b460c3b3-ca29-4152-adfa-7ec4ba20399e
+		summarizeBy: none
+		sourceColumn: Pk_Suppliers
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Suppliers = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DWH_SAP"),
+				    dbo_Dim_Suppliers = Source{[Schema="dbo",Item="Dim_Suppliers"]}[Data],
+				    #"Valeur remplacée" = Table.ReplaceValue(dbo_Dim_Suppliers,"amineGadourrrrrrrrr","Auchan",Replacer.ReplaceText,{"Name"})
+				in
+				    #"Valeur remplacée"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

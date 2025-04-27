@@ -1,0 +1,51 @@
+model Model
+	culture: fr-FR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: fr-FR
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["Dim_Accounting_journal","Dim_Account","Dim_Customers","Dim_date","Dim_Disputes","Dim_geo","Dim_Grand_Livre","Dim_Invoice_Items","Dim_Payments_Supplier","Dim_Purchase_Orders","Dim_Suppliers","Dim_Supplier_Invoices","Fact_Etat_Financier","Fact_Relation_Externe","sysdiagrams","fn_diagramobjects","supplier_risk_management","Dim_Rentabilité","Dim_Eprise_Performance","Dim_date (2)","Dim_Eprise_Performance (2)","Dim_G_Solvabilité (2)","Fact_Fin_Interne"]
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBIDesktopVersion = 2.142.928.0 (25.04)+de52df9f0bb74ad93a80d89c52d63fe6d07e0e1b
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Dim_Accounting_journal
+ref table DateTableTemplate_1b57350b-7e55-43c3-a9f1-36bcfe9838b8
+ref table LocalDateTable_885624eb-a63f-4a60-95cc-2977a94e9bd5
+ref table Dim_Account
+ref table Dim_Customers
+ref table Dim_date
+ref table LocalDateTable_fffd1f41-514a-4364-a0d8-9df424af368e
+ref table Dim_Disputes
+ref table Dim_geo
+ref table Dim_Grand_Livre
+ref table LocalDateTable_ae4fb3a0-fffd-4c77-a20e-1c81259724d7
+ref table Dim_Invoice_Items
+ref table Dim_Payments_Supplier
+ref table Dim_Purchase_Orders
+ref table LocalDateTable_e1feae75-cdcf-4509-b3a5-f9605d8d05aa
+ref table Dim_Suppliers
+ref table Dim_Supplier_Invoices
+ref table Fact_Etat_Financier
+ref table Fact_Relation_Externe
+ref table sysdiagrams
+ref table fn_diagramobjects
+ref table supplier_risk_management
+ref table Dim_Rentabilité
+ref table Dim_Eprise_Performance
+ref table 'Dim_date (2)'
+ref table 'Dim_Eprise_Performance (2)'
+ref table 'Dim_G_Solvabilité (2)'
+ref table Fact_Fin_Interne
+ref table PagesForUsers
+
+ref role TousVoir
+ref role 'Page Security'
+
+ref cultureInfo fr-FR
+

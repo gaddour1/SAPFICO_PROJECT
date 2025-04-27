@@ -1,0 +1,32 @@
+table 'Dim_Eprise_Performance (2)'
+	lineageTag: 7e30446e-7653-4d4d-8293-82e263cb1276
+
+	column pk_performance
+		dataType: int64
+		formatString: 0
+		lineageTag: 5bb175a4-06a6-446c-9d7c-8aa59cbe2037
+		summarizeBy: sum
+		sourceColumn: pk_performance
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: e89b7767-d742-4127-a4d0-ef4779ca134b
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Dim_Eprise_Performance (2)' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("AMINE", "DW_EXTERNE"),
+				    dbo_Dim_Eprise_Performance = Source{[Schema="dbo",Item="Dim_Eprise_Performance"]}[Data]
+				in
+				    dbo_Dim_Eprise_Performance
+
+	annotation PBI_ResultType = Table
+
