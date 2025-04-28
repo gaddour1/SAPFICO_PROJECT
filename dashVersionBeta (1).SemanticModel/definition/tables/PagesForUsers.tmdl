@@ -28,10 +28,23 @@ table PagesForUsers
 				    "User", STRING,
 				    "Page", STRING,
 				    {
-				        {"daf@entreprise.com", "Page Finances"},
-				        {"supplier@entreprise.com", "Page Fournisseurs"},
-				        {"Aya.Arfaoui@esprit.tn", "Page Risques"},
-				        {"Aya.Arfaoui@esprit.tn", "Home"}
+				        {"Malek.chkoundali@esprit.tn", "Supplier Manager 1"},
+				        {"Malek.chkoundali@esprit.tn", "Supplier Manager2"},
+				         {"Malek.chkoundali@esprit.tn", "Supplier Manager2"},
+				
+				        {"Aya.Arfaoui@esprit.tn", "Risk Manager 1"},
+				        {"Aya.Arfaoui@esprit.tn", "Risk Manager2"},
+				
+				        {"SeifEddine.Kallela@esprit.tn", "DAF 1"},
+				        {"SeifEddine.Kallela@esprit.tn", "DAF2"},
+				
+				        {"Aya.Arfaoui@esprit.tn", "Home"},
+				        {"Malek.Chkoundali@esprit.tn", "Home"},
+				        {"SeifEddine.Kallela@esprit.tn", "Home"},
+				
+				        {"Aya.Arfaoui@esprit.tn", "OVERVIEW"},
+				        {"Malek.chkoundali@esprit.tn", "OVERVIEW"},
+				        {"SeifEddine.Kallela@esprit.tn", "OVERVIEW"}
 				    }
 				)
 				
